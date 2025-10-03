@@ -93,11 +93,32 @@ endlocal
 exit /b 0
 :: Function to refresh environment variables
 :RefreshEnv
-set "REPAIR_MODE=1"
 for /f "tokens=2*" %%a in ('reg query "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" /v Path ^| findstr /i "Path"') do set "SysPath=%%b"
 for /f "tokens=2*" %%a in ('reg query "HKCU\Environment" /v Path ^| findstr /i "Path"') do set "UsrPath=%%b"
 set "PATH=%SysPath%;%UsrPath%"
 echo Sometimes it takes 1 Install and 1 Repair for dot net to work correctly. 
 echo IF Installer runs again click REPAIR.
+:: --- Check if we're in repair mode and installation already failed ---
+if "%REPAIR_MODE%"=="1" (
+    echo.
+    echo ============================================
+    echo AUTOMATIC INSTALLATION HAS FAILED
+    echo ============================================
+    echo.
+    echo Please manually download and install the .NET Runtime:
+    echo.
+    echo Download URL:
+    echo https://builds.dotnet.microsoft.com/dotnet/Runtime/6.0.36/dotnet-runtime-6.0.36-win-x64.exe
+    echo.
+    echo Please manually install the dotnet
+    echo ============================================
+    pause
+    pause
+    pause
+    exit /b 1
+)
+
+set "REPAIR_MODE=1"
+
 goto startstart
 exit /b
